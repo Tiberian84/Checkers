@@ -8,23 +8,23 @@ using json = nlohmann::json;
 class Config
 {
   public:
-    Config()
+    Config()    // Конструктор по умолчанию, инициализирует конфигурацию загрузкой настроек
     {
         reload();
     }
 
-    void reload()
+    void reload()   // Перезагружает конфигурацию из файла settings.json, обновляя данные в объекте config
     {
         std::ifstream fin(project_path + "settings.json");
         fin >> config;
         fin.close();
     }
 
-    auto operator()(const string &setting_dir, const string &setting_name) const
+    auto operator()(const string &setting_dir, const string &setting_name) const    // Перегрузка оператора () для удобного доступа к значениям конфигурации по разделу и имени настройки (например, config("Bot", "IsWhiteBot"))
     {
         return config[setting_dir][setting_name];
     }
 
   private:
-    json config;
+    json config;    // Объект JSON для хранения конфигурационных данных
 };
