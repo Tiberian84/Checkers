@@ -19,7 +19,7 @@ using namespace std;
 class Board
 {
 public:
-    Board() = default;  // Конструктор по умолчанию, не инициализирует ничего
+    Board() = default;  // Конструктор по умолчанию, не инициализирует ничего1
     Board(const unsigned int W, const unsigned int H) : W(W), H(H)  // Конструктор с заданием размеров окна (W — ширина, H — высота)
     {
     }
