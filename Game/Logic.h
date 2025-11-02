@@ -1,7 +1,7 @@
 #pragma once
 #include <random>
 #include <vector>
-#include <cassert> // Для использования assert
+#include <cassert> // Р”Р»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ assert
 #include "../Models/Move.h"
 #include "Board.h"
 #include "Config.h"
@@ -11,12 +11,12 @@ const int INF = 1e9;
 class Logic
 {
 public:
-    Logic(Board* board, Config* config) : board(board), config(config), Max_depth(5) // Значение по умолчанию
+    Logic(Board* board, Config* config) : board(board), config(config), Max_depth(5) // Р—РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
     {
         rand_eng = std::default_random_engine(
             !((*config)("Bot", "NoRandom")) ? static_cast<unsigned>(time(0)) : 0);
         optimization = (*config)("Bot", "Optimization");
-        // Можно добавить настройку Max_depth из config, если нужно:
+        // РњРѕР¶РЅРѕ РґРѕР±Р°РІРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєСѓ Max_depth РёР· config, РµСЃР»Рё РЅСѓР¶РЅРѕ:
         // if (config->contains("Bot", "MaxDepth")) Max_depth = (*config)("Bot", "MaxDepth");
     }
 
@@ -34,51 +34,51 @@ public:
                 state = next_best_state[state];
             }
             else {
-                break; // Выход при выходе за пределы
+                break; // Р’С‹С…РѕРґ РїСЂРё РІС‹С…РѕРґРµ Р·Р° РїСЂРµРґРµР»С‹
             }
         } while (state != -1 && (static_cast<size_t>(state) < next_move.size() && next_move[state].x != -1));
         return res;
     }
 
 private:
-    std::vector<std::vector<POS_T>> make_turn(std::vector<std::vector<POS_T>> mtx, const move_pos& turn) const // Выполняет ход на копии матрицы
+    std::vector<std::vector<POS_T>> make_turn(std::vector<std::vector<POS_T>> mtx, const move_pos& turn) const // Р’С‹РїРѕР»РЅСЏРµС‚ С…РѕРґ РЅР° РєРѕРїРёРё РјР°С‚СЂРёС†С‹
     {
         assert(mtx.size() == 8 && !mtx.empty() && mtx[0].size() == 8 && "Invalid matrix size in make_turn");
         if (turn.xb != -1) {
             assert(turn.xb < 8 && turn.yb < 8 && "Invalid beat position");
-            mtx[turn.xb][turn.yb] = 0;  // Удаление съеденной шашки
+            mtx[turn.xb][turn.yb] = 0;  // РЈРґР°Р»РµРЅРёРµ СЃСЉРµРґРµРЅРЅРѕР№ С€Р°С€РєРё
         }
         assert(turn.x < 8 && turn.y < 8 && turn.x2 < 8 && turn.y2 < 8 && "Invalid move position");
         if ((mtx[turn.x][turn.y] == 1 && turn.x2 == 0) || (mtx[turn.x][turn.y] == 2 && turn.x2 == 7))
-            mtx[turn.x][turn.y] += 2;   // Преобразование шашки в дамку
-        mtx[turn.x2][turn.y2] = mtx[turn.x][turn.y];    // Перемещение шашки
-        mtx[turn.x][turn.y] = 0;    // Очистка начальной позиции
-        return mtx; // Возвращение обновлённой матрицы
+            mtx[turn.x][turn.y] += 2;   // РџСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ С€Р°С€РєРё РІ РґР°РјРєСѓ
+        mtx[turn.x2][turn.y2] = mtx[turn.x][turn.y];    // РџРµСЂРµРјРµС‰РµРЅРёРµ С€Р°С€РєРё
+        mtx[turn.x][turn.y] = 0;    // РћС‡РёСЃС‚РєР° РЅР°С‡Р°Р»СЊРЅРѕР№ РїРѕР·РёС†РёРё
+        return mtx; // Р’РѕР·РІСЂР°С‰РµРЅРёРµ РѕР±РЅРѕРІР»С‘РЅРЅРѕР№ РјР°С‚СЂРёС†С‹
     }
 
-    double calc_score(const std::vector<std::vector<POS_T>>& mtx, const bool first_bot_color) const   // Вычисляет оценку позиции
+    double calc_score(const std::vector<std::vector<POS_T>>& mtx, const bool first_bot_color) const   // Р’С‹С‡РёСЃР»СЏРµС‚ РѕС†РµРЅРєСѓ РїРѕР·РёС†РёРё
     {
         assert(mtx.size() == 8 && !mtx.empty() && mtx[0].size() == 8 && "Invalid matrix size in calc_score");
-        double w = 0, wq = 0, b = 0, bq = 0;    // Счётчики для белых шашек, дамок, чёрных шашек и дамок
+        double w = 0, wq = 0, b = 0, bq = 0;    // РЎС‡С‘С‚С‡РёРєРё РґР»СЏ Р±РµР»С‹С… С€Р°С€РµРє, РґР°РјРѕРє, С‡С‘СЂРЅС‹С… С€Р°С€РµРє Рё РґР°РјРѕРє
         for (POS_T i = 0; i < 8; ++i) {
             for (POS_T j = 0; j < 8; ++j) {
                 assert(mtx[i][j] >= 0 && mtx[i][j] <= 4 && "Invalid piece value");
-                w += (mtx[i][j] == 1);  // Подсчёт белых шашек
-                wq += (mtx[i][j] == 3); // Подсчёт белых дамок
-                b += (mtx[i][j] == 2);  // Подсчёт чёрных шашек
-                bq += (mtx[i][j] == 4); // Подсчёт чёрных дамок
+                w += (mtx[i][j] == 1);  // РџРѕРґСЃС‡С‘С‚ Р±РµР»С‹С… С€Р°С€РµРє
+                wq += (mtx[i][j] == 3); // РџРѕРґСЃС‡С‘С‚ Р±РµР»С‹С… РґР°РјРѕРє
+                b += (mtx[i][j] == 2);  // РџРѕРґСЃС‡С‘С‚ С‡С‘СЂРЅС‹С… С€Р°С€РµРє
+                bq += (mtx[i][j] == 4); // РџРѕРґСЃС‡С‘С‚ С‡С‘СЂРЅС‹С… РґР°РјРѕРє
             }
         }
-        if (!first_bot_color) {   // Инверсия значений для игрока другого цвета
+        if (!first_bot_color) {   // РРЅРІРµСЂСЃРёСЏ Р·РЅР°С‡РµРЅРёР№ РґР»СЏ РёРіСЂРѕРєР° РґСЂСѓРіРѕРіРѕ С†РІРµС‚Р°
             std::swap(b, w);
             std::swap(bq, wq);
         }
-        if (w + wq == 0)    // Победа чёрных (все белые съедены)
+        if (w + wq == 0)    // РџРѕР±РµРґР° С‡С‘СЂРЅС‹С… (РІСЃРµ Р±РµР»С‹Рµ СЃСЉРµРґРµРЅС‹)
             return INF;
-        if (b + bq == 0)    // Победа белых (все чёрные съедены)
+        if (b + bq == 0)    // РџРѕР±РµРґР° Р±РµР»С‹С… (РІСЃРµ С‡С‘СЂРЅС‹Рµ СЃСЉРµРґРµРЅС‹)
             return 0;
-        int q_coef = 4; // Коэффициент для дамок
-        return (b + bq * q_coef) / (w + wq * q_coef);   // Нормализованная оценка
+        int q_coef = 4; // РљРѕСЌС„С„РёС†РёРµРЅС‚ РґР»СЏ РґР°РјРѕРє
+        return (b + bq * q_coef) / (w + wq * q_coef);   // РќРѕСЂРјР°Р»РёР·РѕРІР°РЅРЅР°СЏ РѕС†РµРЅРєР°
     }
 
     double find_first_best_turn(std::vector<std::vector<POS_T>> mtx, const bool color, const POS_T x, const POS_T y, size_t state,
@@ -149,7 +149,7 @@ private:
             }
             min_score = std::min(min_score, score);
             max_score = std::max(max_score, score);
-            // Альфа-бета обрезка
+            // РђР»СЊС„Р°-Р±РµС‚Р° РѕР±СЂРµР·РєР°
             if (depth % 2) {
                 alpha = std::max(alpha, max_score);
             }
@@ -164,18 +164,18 @@ private:
     }
 
 public:
-    void find_turns(const bool color)   // Инициализирует поиск всех ходов для указанного цвета
+    void find_turns(const bool color)   // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµС‚ РїРѕРёСЃРє РІСЃРµС… С…РѕРґРѕРІ РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ С†РІРµС‚Р°
     {
         find_turns(color, board->get_board());
     }
 
-    void find_turns(const POS_T x, const POS_T y)   // Инициализирует поиск ходов для шашки на позиции (x, y)
+    void find_turns(const POS_T x, const POS_T y)   // РРЅРёС†РёР°Р»РёР·РёСЂСѓРµС‚ РїРѕРёСЃРє С…РѕРґРѕРІ РґР»СЏ С€Р°С€РєРё РЅР° РїРѕР·РёС†РёРё (x, y)
     {
         find_turns(x, y, board->get_board());
     }
 
 private:
-    void find_turns(const bool color, const std::vector<std::vector<POS_T>>& mtx) // Ищет все возможные ходы для указанного цвета
+    void find_turns(const bool color, const std::vector<std::vector<POS_T>>& mtx) // РС‰РµС‚ РІСЃРµ РІРѕР·РјРѕР¶РЅС‹Рµ С…РѕРґС‹ РґР»СЏ СѓРєР°Р·Р°РЅРЅРѕРіРѕ С†РІРµС‚Р°
     {
         assert(mtx.size() == 8 && !mtx.empty() && mtx[0].size() == 8 && "Invalid matrix size in find_turns");
         std::vector<move_pos> res_turns;
@@ -201,7 +201,7 @@ private:
         have_beats = have_beats_before;
     }
 
-    void find_turns(const POS_T x, const POS_T y, const std::vector<std::vector<POS_T>>& mtx) // Ищет возможные ходы для конкретной шашки
+    void find_turns(const POS_T x, const POS_T y, const std::vector<std::vector<POS_T>>& mtx) // РС‰РµС‚ РІРѕР·РјРѕР¶РЅС‹Рµ С…РѕРґС‹ РґР»СЏ РєРѕРЅРєСЂРµС‚РЅРѕР№ С€Р°С€РєРё
     {
         assert(mtx.size() == 8 && !mtx.empty() && mtx[0].size() == 8 && "Invalid matrix size in find_turns");
         assert(x < 8 && y < 8 && "Invalid position");
@@ -269,15 +269,15 @@ private:
     }
 
 public:
-    std::vector<move_pos> turns;  // Список всех возможных ходов для текущего состояния
-    bool have_beats;  // Флаг, указывающий, есть ли доступные ходы с битьём
-    int Max_depth;  // Максимальная глубина поиска для алгоритма минимиакса
+    std::vector<move_pos> turns;  // РЎРїРёСЃРѕРє РІСЃРµС… РІРѕР·РјРѕР¶РЅС‹С… С…РѕРґРѕРІ РґР»СЏ С‚РµРєСѓС‰РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ
+    bool have_beats;  // Р¤Р»Р°Рі, СѓРєР°Р·С‹РІР°СЋС‰РёР№, РµСЃС‚СЊ Р»Рё РґРѕСЃС‚СѓРїРЅС‹Рµ С…РѕРґС‹ СЃ Р±РёС‚СЊС‘Рј
+    int Max_depth;  // РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РіР»СѓР±РёРЅР° РїРѕРёСЃРєР° РґР»СЏ Р°Р»РіРѕСЂРёС‚РјР° РјРёРЅРёРјРёР°РєСЃР°
 
 private:
-    std::default_random_engine rand_eng;  // Генератор случайных чисел для перемешивания ходов
-    std::string optimization;  // Уровень оптимизации (например, "O0" для отсутствия альфа-бета обрезки)
-    std::vector<move_pos> next_move;  // Список лучших ходов для каждого состояния в дереве поиска
-    std::vector<int> next_best_state;  // Список индексов следующего лучшего состояния для каждого состояния
-    Board* board;  // Указатель на объект доски для доступа к её состоянию
-    Config* config;  // Указатель на объект конфигурации для получения параметров бота
+    std::default_random_engine rand_eng;  // Р“РµРЅРµСЂР°С‚РѕСЂ СЃР»СѓС‡Р°Р№РЅС‹С… С‡РёСЃРµР» РґР»СЏ РїРµСЂРµРјРµС€РёРІР°РЅРёСЏ С…РѕРґРѕРІ
+    std::string optimization;  // РЈСЂРѕРІРµРЅСЊ РѕРїС‚РёРјРёР·Р°С†РёРё (РЅР°РїСЂРёРјРµСЂ, "O0" РґР»СЏ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ Р°Р»СЊС„Р°-Р±РµС‚Р° РѕР±СЂРµР·РєРё)
+    std::vector<move_pos> next_move;  // РЎРїРёСЃРѕРє Р»СѓС‡С€РёС… С…РѕРґРѕРІ РґР»СЏ РєР°Р¶РґРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ РІ РґРµСЂРµРІРµ РїРѕРёСЃРєР°
+    std::vector<int> next_best_state;  // РЎРїРёСЃРѕРє РёРЅРґРµРєСЃРѕРІ СЃР»РµРґСѓСЋС‰РµРіРѕ Р»СѓС‡С€РµРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ РґР»СЏ РєР°Р¶РґРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ
+    Board* board;  // РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РѕР±СЉРµРєС‚ РґРѕСЃРєРё РґР»СЏ РґРѕСЃС‚СѓРїР° Рє РµС‘ СЃРѕСЃС‚РѕСЏРЅРёСЋ
+    Config* config;  // РЈРєР°Р·Р°С‚РµР»СЊ РЅР° РѕР±СЉРµРєС‚ РєРѕРЅС„РёРіСѓСЂР°С†РёРё РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ Р±РѕС‚Р°
 };

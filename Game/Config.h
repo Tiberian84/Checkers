@@ -8,23 +8,23 @@ using json = nlohmann::json;
 class Config
 {
   public:
-    Config()    // Конструктор по умолчанию, инициализирует конфигурацию загрузкой настроек
+    Config()    // РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ, РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµС‚ РєРѕРЅС„РёРіСѓСЂР°С†РёСЋ Р·Р°РіСЂСѓР·РєРѕР№ РЅР°СЃС‚СЂРѕРµРє
     {
         reload();
     }
 
-    void reload()   // Перезагружает конфигурацию из файла settings.json, обновляя данные в объекте config
+    void reload()   // РџРµСЂРµР·Р°РіСЂСѓР¶Р°РµС‚ РєРѕРЅС„РёРіСѓСЂР°С†РёСЋ РёР· С„Р°Р№Р»Р° settings.json, РѕР±РЅРѕРІР»СЏСЏ РґР°РЅРЅС‹Рµ РІ РѕР±СЉРµРєС‚Рµ config
     {
         std::ifstream fin(project_path + "settings.json");
         fin >> config;
         fin.close();
     }
 
-    auto operator()(const string &setting_dir, const string &setting_name) const    // Перегрузка оператора () для удобного доступа к значениям конфигурации по разделу и имени настройки (например, config("Bot", "IsWhiteBot"))
+    auto operator()(const string &setting_dir, const string &setting_name) const    // РџРµСЂРµРіСЂСѓР·РєР° РѕРїРµСЂР°С‚РѕСЂР° () РґР»СЏ СѓРґРѕР±РЅРѕРіРѕ РґРѕСЃС‚СѓРїР° Рє Р·РЅР°С‡РµРЅРёСЏРј РєРѕРЅС„РёРіСѓСЂР°С†РёРё РїРѕ СЂР°Р·РґРµР»Сѓ Рё РёРјРµРЅРё РЅР°СЃС‚СЂРѕР№РєРё (РЅР°РїСЂРёРјРµСЂ, config("Bot", "IsWhiteBot"))
     {
         return config[setting_dir][setting_name];
     }
 
   private:
-    json config;    // Объект JSON для хранения конфигурационных данных
+    json config;    // РћР±СЉРµРєС‚ JSON РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РєРѕРЅС„РёРіСѓСЂР°С†РёРѕРЅРЅС‹С… РґР°РЅРЅС‹С…
 };
